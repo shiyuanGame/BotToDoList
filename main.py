@@ -4,7 +4,7 @@ import parsedatetime
 from datetime import datetime, timedelta 
 from dateutil.relativedelta  import relativedelta 
 import re 
- 
+import asyncio 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 scheduler = AsyncIOScheduler()
@@ -135,12 +135,17 @@ class MyPlugin(BasePlugin):
         tittle=extract_reminder(msg)
             # 尝试解析时间
         try:
-            title =tittle[1]
+            title =tittle[0]
             parsed_time =tittle[1]
             if parsed_time:
                 # 注册任务
                 ctx.add_return("reply", [f"✅ 已为你设置提醒：{title}\n📅 时间：{parsed_time.strftime('%Y-%m-%d %H:%M:%S')}"])
-                scheduler.add_job(send_reminder, 'date', run_date=parsed_time, args=[ ctx , f"{title}"])
+                # 封装带参数的匿名任务 
+                scheduler.add_job( 
+                    lambda:asyncio .create_task(send_reminder(ctx,  f"{title}")),
+                    'date',
+                    run_date=parsed_time 
+                )
                 ctx.prevent_default()
                 return
         except Exception as e:
