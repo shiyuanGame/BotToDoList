@@ -4,25 +4,35 @@ import parsedatetime
 from datetime import datetime, timedelta 
 from dateutil.relativedelta  import relativedelta 
 import re 
-# 中文时间名词映射 
-time_mapping = { 
-    '现在': timedelta(0), 
-    '今天': timedelta(0), 
-    '明天': timedelta(days=1), 
-    '后天': timedelta(days=2), 
-    '大后天': timedelta(days=3), 
-    '昨天': timedelta(days=-1), 
-    '前天': timedelta(days=-2), 
-    '大前天': timedelta(days=-3), 
-    '半月后': timedelta(days=15), 
-    '半年后': relativedelta(months=6), 
-    '一年后': relativedelta(years=1), 
-    '一月后': relativedelta(months=1), 
-    '一周后': timedelta(weeks=1) 
-} 
+ 
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
+scheduler = AsyncIOScheduler()
+scheduler.start()
+
+async def send_reminder(ctx, message):
+    ctx.add_return("reply", ["hello, {} ,{}  !".format(ctx.event.sender_id, message)])
+
+
 
 def parse_time_expression(expr): 
+# 中文时间名词映射 
     now = datetime.now()  
+    time_mapping = { 
+        '现在': timedelta(0), 
+        '今天': timedelta(0), 
+        '明天': timedelta(days=1), 
+        '后天': timedelta(days=2), 
+        '大后天': timedelta(days=3), 
+        '昨天': timedelta(days=-1), 
+        '前天': timedelta(days=-2), 
+        '大前天': timedelta(days=-3), 
+        '半月后': timedelta(days=15), 
+        '半年后': relativedelta(months=6), 
+        '一年后': relativedelta(years=1), 
+        '一月后': relativedelta(months=1), 
+        '一周后': timedelta(weeks=1) 
+    } 
     # 处理中文时间名词 
     if expr in time_mapping: 
         return now + time_mapping[expr] 
@@ -33,7 +43,6 @@ def parse_time_expression(expr):
         num = int(match.group(1))     # 数字部分（如"3"）
         unit = match.group(2)    # 单位（如"小时"）
         direction = match.group(3)   # 方向（如"后"）
-
         delta = None 
         if unit == '秒': 
             delta = timedelta(seconds=num) 
@@ -80,17 +89,29 @@ def parse_time_expression(expr):
         return datetime(now.year,  now.month,  now.day,  hour, 0, 0)
  
     return None 
- 
+
+
 
 def extract_reminder(input_str):
     """分离时间部分和提醒内容"""
     # 尝试逐步截取最长可解析的时间表达式 
-    for i in range(len(input_str), 0, -1):
-        time_candidate = input_str[:i]
-        if parse_time_expression(time_candidate) is not None:
-            content = re.sub(r'^( 提醒我|记得|要)\s*', '', input_str[i:].strip())
-            return time_candidate, content 
-    return None, input_str  # 未找到时间部分时返回整个内容 
+    keywords = ['提醒我', '记得', '要']
+    for keyword in keywords:
+            if keyword in input_str:
+                # 分割字符串并取第一个匹配项后的内容 
+                parts = input_str.split(keyword,  1)
+                if len(parts) > 1:
+                    title = parts[1].split('|', 1)[0].strip()
+                    break; 
+ 
+ 
+
+    time =     parse_time_expression(input_str)
+    
+ 
+ 
+    return (title , time)
+    
 
 
 # 注册插件
@@ -110,12 +131,23 @@ class MyPlugin(BasePlugin):
     @handler(PersonNormalMessageReceived)
     async def person_normal_message_received(self, ctx: EventContext):
         msg = ctx.event.text_message  # 这里的 event 即为 PersonNormalMessageReceived 的对象
-        test= parse_time_expression(msg) 
+
         tittle=extract_reminder(msg)
-        # 回复消息 "hello, <发送者id>!"
-        ctx.add_return("reply", ["hello, {} ,{} ,{}!".format(ctx.event.sender_id,test,tittle)])
-        # 阻止该事件默认行为（向接口获取回复）
-        ctx.prevent_default()
+            # 尝试解析时间
+        try:
+            title =tittle[1]
+            parsed_time =tittle[1]
+            if parsed_time:
+                # 注册任务
+                scheduler.add_job(send_reminder, 'date', run_date=parsed_time, args=[self.ap,ctx , f"{title}"])
+                ctx.add_return("reply", ["hello, {} ,{}  !".format(ctx.event.sender_id, title)])
+                ctx.prevent_default()
+                return
+        except Exception as e:
+            self.ap.logger.error(f"时间解析失败: {e}")
+            
+         
+
     # 当收到群消息时触发
     @handler(GroupNormalMessageReceived)
     async def group_normal_message_received(self, ctx: EventContext):

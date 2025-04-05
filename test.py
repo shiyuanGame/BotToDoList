@@ -5,25 +5,25 @@ import re
 # 当前时间 
 
 
-# 中文时间名词映射 
-time_mapping = { 
-    '现在': timedelta(0), 
-    '今天': timedelta(0), 
-    '明天': timedelta(days=1), 
-    '后天': timedelta(days=2), 
-    '大后天': timedelta(days=3), 
-    '昨天': timedelta(days=-1), 
-    '前天': timedelta(days=-2), 
-    '大前天': timedelta(days=-3), 
-    '半月后': timedelta(days=15), 
-    '半年后': relativedelta(months=6), 
-    '一年后': relativedelta(years=1), 
-    '一月后': relativedelta(months=1), 
-    '一周后': timedelta(weeks=1) 
-} 
 
 def parse_time_expression(expr): 
+# 中文时间名词映射 
     now = datetime.now()  
+    time_mapping = { 
+        '现在': timedelta(0), 
+        '今天': timedelta(0), 
+        '明天': timedelta(days=1), 
+        '后天': timedelta(days=2), 
+        '大后天': timedelta(days=3), 
+        '昨天': timedelta(days=-1), 
+        '前天': timedelta(days=-2), 
+        '大前天': timedelta(days=-3), 
+        '半月后': timedelta(days=15), 
+        '半年后': relativedelta(months=6), 
+        '一年后': relativedelta(years=1), 
+        '一月后': relativedelta(months=1), 
+        '一周后': timedelta(weeks=1) 
+    } 
     # 处理中文时间名词 
     if expr in time_mapping: 
         return now + time_mapping[expr] 
@@ -34,7 +34,7 @@ def parse_time_expression(expr):
         num = int(match.group(1))     # 数字部分（如"3"）
         unit = match.group(2)    # 单位（如"小时"）
         direction = match.group(3)   # 方向（如"后"）
-        print(f"'{case}': num={num}, unit={unit}, direction={direction}")
+
         delta = None 
         if unit == '秒': 
             delta = timedelta(seconds=num) 
@@ -87,13 +87,27 @@ def parse_time_expression(expr):
 def extract_reminder(input_str):
     """分离时间部分和提醒内容"""
     # 尝试逐步截取最长可解析的时间表达式 
-    for i in range(len(input_str), 0, -1):
-        time_candidate = input_str[:i]
-        if parse_time_expression(time_candidate) is not None:
-            content = re.sub(r'^( 提醒我|记得|要)\s*', '', input_str[i:].strip())
-            return time_candidate, content 
-    return None, input_str  # 未找到时间部分时返回整个内容 
+    keywords = ['提醒我', '记得', '要']
+    for keyword in keywords:
+            if keyword in input_str:
+                # 分割字符串并取第一个匹配项后的内容 
+                parts = input_str.split(keyword,  1)
+                if len(parts) > 1:
+                    title = parts[1].split('|', 1)[0].strip()
+                    break; 
+ 
+ 
 
+    time =     parse_time_expression(input_str)
+    
+    # # parse_time_expression(input_str)
+ 
+    return (title , time)
+    
+ 
+testname=extract_reminder("3小时后提醒我开飞机")
+print(testname[0])
+print(testname[1])
 
 # 测试示例 
 test_cases = [ 
@@ -115,12 +129,4 @@ test_cases = [
     '10点30分15秒' ,
     '10点0分' ,
 
-] 
- 
-for case in test_cases: 
-    result = parse_time_expression(case) 
-    if result: 
-        print(f"'{case}': {result.strftime('%Y-%m-%d  %H:%M:%S')}") 
-    else: 
-        print(f"无法解析: {case}") 
- 
+]
