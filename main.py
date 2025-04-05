@@ -82,6 +82,17 @@ def parse_time_expression(expr):
     return None 
  
 
+def extract_reminder(input_str):
+    """分离时间部分和提醒内容"""
+    # 尝试逐步截取最长可解析的时间表达式 
+    for i in range(len(input_str), 0, -1):
+        time_candidate = input_str[:i]
+        if parse_time_expression(time_candidate) is not None:
+            content = re.sub(r'^( 提醒我|记得|要)\s*', '', input_str[i:].strip())
+            return time_candidate, content 
+    return None, input_str  # 未找到时间部分时返回整个内容 
+
+
 # 注册插件
 @register(name="Hello", description="hello world", version="0.1", author="Shiyuan")
 class MyPlugin(BasePlugin):
@@ -100,8 +111,9 @@ class MyPlugin(BasePlugin):
     async def person_normal_message_received(self, ctx: EventContext):
         msg = ctx.event.text_message  # 这里的 event 即为 PersonNormalMessageReceived 的对象
         test= parse_time_expression(msg) 
+        tittle=extract_reminder(msg)
         # 回复消息 "hello, <发送者id>!"
-        ctx.add_return("reply", ["hello, {} ,{}!".format(ctx.event.sender_id,test)])
+        ctx.add_return("reply", ["hello, {} ,{} ,{}!".format(ctx.event.sender_id,test,tittle)])
         # 阻止该事件默认行为（向接口获取回复）
         ctx.prevent_default()
     # 当收到群消息时触发

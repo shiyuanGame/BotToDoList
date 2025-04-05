@@ -81,7 +81,20 @@ def parse_time_expression(expr):
         return datetime(now.year,  now.month,  now.day,  hour, 0, 0)
  
     return None 
- 
+
+
+
+def extract_reminder(input_str):
+    """分离时间部分和提醒内容"""
+    # 尝试逐步截取最长可解析的时间表达式 
+    for i in range(len(input_str), 0, -1):
+        time_candidate = input_str[:i]
+        if parse_time_expression(time_candidate) is not None:
+            content = re.sub(r'^( 提醒我|记得|要)\s*', '', input_str[i:].strip())
+            return time_candidate, content 
+    return None, input_str  # 未找到时间部分时返回整个内容 
+
+
 # 测试示例 
 test_cases = [ 
     '现在', 
