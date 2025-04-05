@@ -115,7 +115,7 @@ def extract_reminder(input_str):
 
 
 # 注册插件
-@register(name="Hello", description="hello world", version="0.1", author="Shiyuan")
+@register(name="Hello", description="BotTodoList", version="0.2", author="Shiyuan")
 class MyPlugin(BasePlugin):
 
     # 插件加载时触发
@@ -140,13 +140,14 @@ class MyPlugin(BasePlugin):
             if parsed_time:
                 # 注册任务
                 scheduler.add_job(send_reminder, 'date', run_date=parsed_time, args=[self.ap,ctx , f"{title}"])
-                ctx.add_return("reply", ["hello, {} ,{}  !".format(ctx.event.sender_id, title)])
+                ctx.add_return("reply", [f"✅ 已为你设置提醒：{msg}\n📅 时间：{parsed_time.strftime('%Y-%m-%d %H:%M:%S')}"])
+      
                 ctx.prevent_default()
                 return
         except Exception as e:
-            self.ap.logger.error(f"时间解析失败: {e}")
+                ctx.add_return("reply", ["hello, {} !".format(e)])
             
-         
+
 
     # 当收到群消息时触发
     @handler(GroupNormalMessageReceived)
