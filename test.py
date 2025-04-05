@@ -1,9 +1,10 @@
-from pkg.plugin.context import register, handler, llm_func, BasePlugin, APIHost, EventContext
-from pkg.plugin.events import *  # 导入事件类
-import parsedatetime 
 from datetime import datetime, timedelta 
 from dateutil.relativedelta  import relativedelta 
 import re 
+
+# 当前时间 
+
+
 # 中文时间名词映射 
 time_mapping = { 
     '现在': timedelta(0), 
@@ -33,7 +34,7 @@ def parse_time_expression(expr):
         num = int(match.group(1))     # 数字部分（如"3"）
         unit = match.group(2)    # 单位（如"小时"）
         direction = match.group(3)   # 方向（如"后"）
-
+        print(f"'{case}': num={num}, unit={unit}, direction={direction}")
         delta = None 
         if unit == '秒': 
             delta = timedelta(seconds=num) 
@@ -81,44 +82,32 @@ def parse_time_expression(expr):
  
     return None 
  
+# 测试示例 
+test_cases = [ 
+    '现在', 
+    '明天', 
+    '后天', 
+    '大后天', 
+    '昨天', 
+    '前天', 
+    '大前天', 
+    '3小时后', 
+    '5分钟前', 
+    '2天后', 
+    '1周后', 
+    '3月后', 
+    '2年前', 
+    '半年后', 
+    '半月后', 
+    '10点30分15秒' ,
+    '10点0分' ,
 
-# 注册插件
-@register(name="Hello", description="hello world", version="0.1", author="Shiyuan")
-class MyPlugin(BasePlugin):
-
-    # 插件加载时触发
-    def __init__(self, host: APIHost):
-        pass
-
-    # 异步初始化
-    async def initialize(self):
-        pass
-
-
-    # 当收到个人消息时触发
-    @handler(PersonNormalMessageReceived)
-    async def person_normal_message_received(self, ctx: EventContext):
-        msg = ctx.event.text_message  # 这里的 event 即为 PersonNormalMessageReceived 的对象
-        test= parse_time_expression(msg) 
-        # 回复消息 "hello, <发送者id>!"
-        ctx.add_return("reply", ["hello, {} ,{}!".format(ctx.event.sender_id,test)])
-        # 阻止该事件默认行为（向接口获取回复）
-        ctx.prevent_default()
-    # 当收到群消息时触发
-    @handler(GroupNormalMessageReceived)
-    async def group_normal_message_received(self, ctx: EventContext):
-        msg = ctx.event.text_message  # 这里的 event 即为 GroupNormalMessageReceived 的对象
-        if msg == "hello":  # 如果消息为hello
-
-            # 输出调试信息
-            self.ap.logger.debug("hello, {}".format(ctx.event.sender_id))
-
-            # 回复消息 "hello, everyone!"
-            ctx.add_return("reply", ["hello, everyone!"])
-
-            # 阻止该事件默认行为（向接口获取回复）
-            ctx.prevent_default()
-
-    # 插件卸载时触发
-    def __del__(self):
-        pass
+] 
+ 
+for case in test_cases: 
+    result = parse_time_expression(case) 
+    if result: 
+        print(f"'{case}': {result.strftime('%Y-%m-%d  %H:%M:%S')}") 
+    else: 
+        print(f"无法解析: {case}") 
+ 
