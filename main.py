@@ -147,7 +147,7 @@ class MyPlugin(BasePlugin):
                                                 
                                                 ),
                     'date',
-                    run_date=parsed_time 
+                    run_date=parsed_time.strftime('%Y-%m-%d %H:%M:%S'), 
                 )
                 ctx.prevent_default()
                 return
