@@ -29,7 +29,7 @@ def parse_time_expression(expr):
         return now + time_mapping[expr] 
 
     # 处理数字+单位格式 
-    match = re.match(r'(\d+)(?:[  个]?)(小时|分钟|秒|天|周|月|年)([前后]?)', case)
+    match = re.match(r'(\d+)(?:[  个]?)(小时|分钟|秒|天|周|月|年)([前后]?)', expr)
     if match:
         num = int(match.group(1))     # 数字部分（如"3"）
         unit = match.group(2)    # 单位（如"小时"）
