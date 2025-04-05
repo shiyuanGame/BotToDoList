@@ -139,9 +139,8 @@ class MyPlugin(BasePlugin):
             parsed_time =tittle[1]
             if parsed_time:
                 # 注册任务
-                scheduler.add_job(send_reminder, 'date', run_date=parsed_time, args=[self.ap,ctx , f"{title}"])
                 ctx.add_return("reply", [f"✅ 已为你设置提醒：{msg}\n📅 时间：{parsed_time.strftime('%Y-%m-%d %H:%M:%S')}"])
-      
+                scheduler.add_job(send_reminder, 'date', run_date=parsed_time.strftime('%Y-%m-%d %H:%M:%S'), args=[ ctx , f"{title}"])
                 ctx.prevent_default()
                 return
         except Exception as e:
