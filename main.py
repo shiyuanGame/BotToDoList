@@ -138,19 +138,18 @@ class MyPlugin(BasePlugin):
             title =tittle[0]
             parsed_time =tittle[1]
             if parsed_time:
-                # 注册任务
-                # ctx.add_return("reply", [f"✅ 已为你设置提醒：{title}\n📅 时间：{parsed_time.strftime('%Y-%m-%d %H:%M:%S')}"])
                 # 封装带参数的匿名任务 
                 scheduler.add_job( 
                     lambda: asyncio.create_task(  
-                                                ctx.add_return("reply", [f"✅ 正在对您进行提醒：{title}，，，{scheduler.get_jjobs()}\n📅  "])
-                                                
+                                                    ctx.add_return("reply", [f"✅ 正在对您进行提醒：{title}，，，{scheduler.get_jjobs()}\n📅  "]),
+                                                    ctx.prevent_default()
+                                                    
                                                 ),
                     'date',
                     run_date=parsed_time.strftime('%Y-%m-%d %H:%M:%S'), 
                 )
                 # ctx.add_return("reply", [f"✅ 已为你设置提醒列表：{scheduler.get_jjobs()} "])
-                ctx.prevent_default()
+
                 return
         except Exception as e:
                 ctx.add_return("reply", ["hello, {} !".format(e)])
