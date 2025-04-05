@@ -1,9 +1,14 @@
 from pkg.plugin.context import register, handler, llm_func, BasePlugin, APIHost, EventContext
 from pkg.plugin.events import *  # 导入事件类
-
+import parsedatetime
+from datetime import datetime
+def parse_chinese_time(text):
+    cal = parsedatetime.Calendar()
+    time_struct, parse_status = cal.parseDT(text, sourceTime=datetime.now())
+    return time_struct if parse_status else None
 
 # 注册插件
-@register(name="Hello", description="hello world", version="0.1", author="RockChinQ")
+@register(name="Hello", description="hello world", version="0.1", author="Shiyuan")
 class MyPlugin(BasePlugin):
 
     # 插件加载时触发
@@ -13,6 +18,7 @@ class MyPlugin(BasePlugin):
     # 异步初始化
     async def initialize(self):
         pass
+
 
     # 当收到个人消息时触发
     @handler(PersonNormalMessageReceived)
@@ -28,7 +34,13 @@ class MyPlugin(BasePlugin):
 
             # 阻止该事件默认行为（向接口获取回复）
             ctx.prevent_default()
+        else:
+            test= parse_chinese_time(msg) 
+            # 回复消息 "hello, <发送者id>!"
+            ctx.add_return("reply", ["hello, {} ,{}!".format(ctx.event.sender_id,test)])
 
+            # 阻止该事件默认行为（向接口获取回复）
+            ctx.prevent_default()
     # 当收到群消息时触发
     @handler(GroupNormalMessageReceived)
     async def group_normal_message_received(self, ctx: EventContext):
