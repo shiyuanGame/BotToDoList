@@ -145,19 +145,23 @@ async def delayed_job(ctx, sender_id):
         try:
             title =tittle[0]
             parsed_time =tittle[1]
-            self.ap.logger.debug("time:::, {}".format(parsed_time.strftime('%Y-%m-%d %H:%M:%S')))
+            self.ap.logger.debug("-aaaaaaaaaaaaaaaaa-")
             if parsed_time:
+                self.ap.logger.debug("----------------")
                 # 封装带参数的匿名任务 
                 scheduler.add_job( 
                     lambda: asyncio.create_task(delayed_job(ctx, ctx.event.sender_id)),
                     trigger='date',
-                    run_date=datetime.now() + timedelta(seconds=30)
+                    run_date= parsed_time,
                 )
                 # 阻止该事件默认行为（向接口获取回复）
+                self.ap.logger.debug("====================")
                 ctx.prevent_default()
+                self.ap.logger.debug("3333333333333333333333")
                 # ctx."reply"("reply", [f"✅ 已为你设置提醒列表：{scheduler.get_jjobs()} "])
                 return
         except Exception as e:
+                self.ap.logger.debug("44444444444444")
                 ctx.add_return("reply", ["hello, {} !".format(e)])
             
 
