@@ -149,25 +149,12 @@ async def delayed_job(ctx, sender_id):
             self.ap.logger.debug("-aaaaaaaaaaaaaaaaa-")
             print("-----")
             if parsed_time:
-                print("======")
-                self.ap.logger.debug("----------------")
-                # 封装带参数的匿名任务 
-                delay = (parsed_time - datetime.now()).total_seconds()
-                if delay > 0:
-                    await asyncio.sleep(delay)
-                    await ctx.add_return("reply", ["hello, {} !".format(e)])
-                # 阻止该事件默认行为（向接口获取回复）
-                self.ap.logger.debug("====================")
-
-                self.ap.logger.debug("3333333333333333333333")
-                # ctx."reply"("reply", [f"✅ 已为你设置提醒列表：{scheduler.get_jjobs()} "])
-                return
+                print("======") 
+            return
         except Exception as e:
+                print("eeeeeeeee",e)
                 self.ap.logger.debug("44444444444444")
                 ctx.add_return("reply", ["hello, {} !".format(e)])
-            
-
-
     # 当收到群消息时触发
     @handler(GroupNormalMessageReceived)
     async def group_normal_message_received(self, ctx: EventContext):
