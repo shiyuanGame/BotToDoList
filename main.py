@@ -145,8 +145,11 @@ async def delayed_job(ctx, sender_id):
         try:
             title =tittle[0]
             parsed_time =tittle[1]
+            print(title)
             self.ap.logger.debug("-aaaaaaaaaaaaaaaaa-")
+            print("-----")
             if parsed_time:
+                print("======")
                 self.ap.logger.debug("----------------")
                 # 封装带参数的匿名任务 
                 delay = (parsed_time - datetime.now()).total_seconds()
