@@ -140,9 +140,9 @@ class MyPlugin(BasePlugin):
             if parsed_time:
                 # 封装带参数的匿名任务 
                 scheduler.add_job( 
-                    lambda: asyncio.create_task(send_reminder(ctx, ctx.event.sender_id, title)),
-                    'date',
-                    run_date=parsed_time.strftime('%Y-%m-%d %H:%M:%S'), 
+                    lambda: asyncio.create_task(ctx.add_return("reply", ["Delayed hello!"])),
+                    trigger='date',
+                    run_date=datetime.now() + timedelta(seconds=30)
                 )
                 # 阻止该事件默认行为（向接口获取回复）
                 ctx.prevent_default()
