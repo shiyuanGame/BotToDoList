@@ -11,8 +11,8 @@ scheduler = AsyncIOScheduler()
 scheduler.start()
 
 async def send_reminder(ap, sender_id, title):
-    await ap.send_person_msg(sender_id, f"hello, {sender_id} , {title}  !")
-    ap.logger.debug("time------, {}".format( datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+    await ap.add_return(sender_id, f"hello, {sender_id} , {title}  !")
+    # ap.logger.debug("time------, {}".format( datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
 
 def parse_time_expression(expr): 
 # 中文时间名词映射 
@@ -140,13 +140,13 @@ class MyPlugin(BasePlugin):
             if parsed_time:
                 # 封装带参数的匿名任务 
                 scheduler.add_job( 
-                   lambda: asyncio.create_task(send_reminder(self.ap, ctx.event.sender_id, title)),
+                    lambda: asyncio.create_task(send_reminder(ctx, ctx.event.sender_id, title)),
                     'date',
                     run_date=parsed_time.strftime('%Y-%m-%d %H:%M:%S'), 
                 )
                 # 阻止该事件默认行为（向接口获取回复）
                 ctx.prevent_default()
-                # ctx.add_return("reply", [f"✅ 已为你设置提醒列表：{scheduler.get_jjobs()} "])
+                # ctx."reply"("reply", [f"✅ 已为你设置提醒列表：{scheduler.get_jjobs()} "])
                 return
         except Exception as e:
                 ctx.add_return("reply", ["hello, {} !".format(e)])
