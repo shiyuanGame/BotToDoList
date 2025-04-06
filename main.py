@@ -138,8 +138,8 @@ async def delayed_job(ctx, sender_id):
     # 当收到个人消息时触发
     @handler(PersonNormalMessageReceived)
     async def person_normal_message_received(self, ctx: EventContext):
+        ctx.prevent_default()
         msg = ctx.event.text_message  # 这里的 event 即为 PersonNormalMessageReceived 的对象
-
         tittle=extract_reminder(msg)
             # 尝试解析时间
         try:
@@ -149,14 +149,13 @@ async def delayed_job(ctx, sender_id):
             if parsed_time:
                 self.ap.logger.debug("----------------")
                 # 封装带参数的匿名任务 
-                scheduler.add_job( 
-                    lambda: asyncio.create_task(delayed_job(ctx, ctx.event.sender_id)),
-                    trigger='date',
-                    run_date= parsed_time,
-                )
+                delay = (parsed_time - datetime.now()).total_seconds()
+                if delay > 0:
+                    await asyncio.sleep(delay)
+                    await ctx.add_return("reply", ["hello, {} !".format(e)])
                 # 阻止该事件默认行为（向接口获取回复）
                 self.ap.logger.debug("====================")
-                ctx.prevent_default()
+
                 self.ap.logger.debug("3333333333333333333333")
                 # ctx."reply"("reply", [f"✅ 已为你设置提醒列表：{scheduler.get_jjobs()} "])
                 return
