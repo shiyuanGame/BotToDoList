@@ -10,7 +10,9 @@ from pytz import timezone
 scheduler = AsyncIOScheduler()
 scheduler.start()
 
- 
+async def send_reminder(ap, sender_id, title):
+    await ap.send_person_msg(sender_id, f"hello, {sender_id} , {title}  !")
+
 
 def parse_time_expression(expr): 
 # 中文时间名词映射 
@@ -137,9 +139,7 @@ class MyPlugin(BasePlugin):
             if parsed_time:
                 # 封装带参数的匿名任务 
                 scheduler.add_job( 
-                    lambda: asyncio.create_task(   
-                                                    ctx.send_reply(ctx.event.sender_id, ["hello, {} ,{}  !".format(ctx.event.sender_id, tittle)])
-                                                ),
+                   lambda: asyncio.create_task(send_reminder(self.ap, ctx.event.sender_id, title)),
                     'date',
                     run_date=parsed_time.strftime('%Y-%m-%d %H:%M:%S'), 
                 )
