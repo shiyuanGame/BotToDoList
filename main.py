@@ -125,6 +125,15 @@ class MyPlugin(BasePlugin):
     async def initialize(self):
         pass
 
+async def delayed_job(ctx, sender_id):
+    try:
+        # 记录日志，确保任务执行
+        self_logger = ctx.ap.logger  # 或者用你全局的 logger
+        self_logger.debug("延迟任务触发，准备回复消息给 {}！".format(sender_id))
+        # 回复消息
+        await ctx.add_return("reply", ["Delayed hello!"])
+    except Exception as e:
+        ctx.ap.logger.error("延迟任务异常: {}".format(e))
 
     # 当收到个人消息时触发
     @handler(PersonNormalMessageReceived)
@@ -140,7 +149,7 @@ class MyPlugin(BasePlugin):
             if parsed_time:
                 # 封装带参数的匿名任务 
                 scheduler.add_job( 
-                    lambda: asyncio.create_task(ctx.add_return("reply", ["Delayed hello!"])),
+                    lambda: asyncio.create_task(delayed_job(ctx, ctx.event.sender_id)),
                     trigger='date',
                     run_date=datetime.now() + timedelta(seconds=30)
                 )
