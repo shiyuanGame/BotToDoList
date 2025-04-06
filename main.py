@@ -12,7 +12,7 @@ scheduler.start()
 
 async def send_reminder(ap, sender_id, title):
     await ap.send_person_msg(sender_id, f"hello, {sender_id} , {title}  !")
-
+    ap.logger.debug("time------, {}".format( datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
 
 def parse_time_expression(expr): 
 # 中文时间名词映射 
@@ -136,6 +136,7 @@ class MyPlugin(BasePlugin):
         try:
             title =tittle[0]
             parsed_time =tittle[1]
+            self.ap.logger.debug("time:::, {}".format(parsed_time.strftime('%Y-%m-%d %H:%M:%S')))
             if parsed_time:
                 # 封装带参数的匿名任务 
                 scheduler.add_job( 
