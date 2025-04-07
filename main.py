@@ -10,9 +10,6 @@ from pytz import timezone
 scheduler = AsyncIOScheduler()
 scheduler.start()
 
-async def send_reminder(ap, sender_id, title):
-    await ap.add_return(sender_id, f"hello, {sender_id} , {title}  !")
-    # ap.logger.debug("time------, {}".format( datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
 
 def parse_time_expression(expr): 
 # 中文时间名词映射 
@@ -114,7 +111,7 @@ def extract_reminder(input_str):
 
 
 # 注册插件
-@register(name="Hello", description="BotTodoList", version="0.2", author="Shiyuan")
+@register(name="ToDoList", description="BotTodoList", version="0.2", author="Shiyuan")
 class MyPlugin(BasePlugin):
 
     # 插件加载时触发
@@ -125,16 +122,24 @@ class MyPlugin(BasePlugin):
     async def initialize(self):
         pass
 
-async def delayed_job(ctx, sender_id):
-    try:
-        # 记录日志，确保任务执行
-        self_logger = ctx.ap.logger  # 或者用你全局的 logger
-        self_logger.debug("延迟任务触发，准备回复消息给 {}！".format(sender_id))
-        # 回复消息
-        await ctx.add_return("reply", ["Delayed hello!"])
-    except Exception as e:
-        ctx.ap.logger.error("延迟任务异常: {}".format(e))
+    async def delayed_job(ctx, sender_id):
+        try:
+            # 记录日志，确保任务执行
+            self_logger = ctx.ap.logger  # 或者用你全局的 logger
+            self_logger.debug("延迟任务触发，准备回复消息给 {}！".format(sender_id))
+            # 回复消息
+            await ctx.add_return("reply", ["Delayed hello!"])
+        except Exception as e:
+            ctx.ap.logger.error("延迟任务异常: {}".format(e))
 
+    # 要放在MyPlugin类里面
+    async def send_reminder(self, ap, sender_id, title):
+            await self.host.send_active_message(
+                                        adapter=self.host.get_platform_adapters()[0],
+                                        target_type="person",
+                                        target_id=sender_id,
+                                        message=[f"hello, {sender_id} , {title}  !"]
+                                    )
     # 当收到个人消息时触发
     @handler(PersonNormalMessageReceived)
     async def person_normal_message_received(self, ctx: EventContext):
@@ -145,15 +150,13 @@ async def delayed_job(ctx, sender_id):
         try:
             title =tittle[0]
             parsed_time =tittle[1]
-            print(title)
-            self.ap.logger.debug("-aaaaaaaaaaaaaaaaa-")
-            print("-----")
             if parsed_time:
-                print("======") 
+                scheduler.add_job( 
+                lambda: asyncio.create_task( self. send_reminder(self,self.ap, ctx.event.sender_id, title)),
+                'date',
+                run_date=parsed_time.strftime('%Y-%m-%d %H:%M:%S'),    )
             return
         except Exception as e:
-                print("eeeeeeeee",e)
-                self.ap.logger.debug("44444444444444")
                 ctx.add_return("reply", ["hello, {} !".format(e)])
     # 当收到群消息时触发
     @handler(GroupNormalMessageReceived)
