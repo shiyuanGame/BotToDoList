@@ -22,7 +22,7 @@ class MyPlugin(BasePlugin):
     def __init__(self, host: APIHost):
         pass
 
-    def parse_time_expression(self,expr): 
+    def parse_time_expression( expr): 
     # 中文时间名词映射 
         now = datetime.now()  
         time_mapping = { 
@@ -127,7 +127,13 @@ class MyPlugin(BasePlugin):
 
     # 要放在MyPlugin类里面
     async def send_reminder(self, ap, sender_id, title):
-            self.ap.logger.debug(f"  get_platform_adapters 0:   {self.host.get_platform_adapters()[0]}")
+            print(f"  get_platform_adapters 0:   {self.host.get_platform_adapters()[0]}")
+            print(f"  get_platform_adapters 1:   {self.host.get_platform_adapters()[1]}")
+            print(f"  get_platform_adapters 2:   {self.host.get_platform_adapters()[2]}")
+            print(f"  get_platform_adapters 3:   {self.host.get_platform_adapters()[3]}")
+            print(f"  get_platform_adapters 4:   {self.host.get_platform_adapters()[4]}")
+            print(f"  get_platform_adapters 5:   {self.host.get_platform_adapters()[5]}")
+            print(f"  get_platform_adapters 6:   {self.host.get_platform_adapters()[6]}")
             await self.host.send_active_message(
                                         adapter="gewechat",
                                         target_type="person",
