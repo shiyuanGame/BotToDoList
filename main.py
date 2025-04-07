@@ -22,7 +22,7 @@ class MyPlugin(BasePlugin):
     def __init__(self, host: APIHost):
         pass
 
-    def parse_time_expression(expr): 
+    def parse_time_expression(self,expr): 
     # 中文时间名词映射 
         now = datetime.now()  
         time_mapping = { 
@@ -139,17 +139,17 @@ class MyPlugin(BasePlugin):
     async def person_normal_message_received(self, ctx: EventContext):
         ctx.prevent_default()
         msg = ctx.event.text_message  # 这里的 event 即为 PersonNormalMessageReceived 的对象
-        tittle=self.extract_reminder(msg)
+        tittle=self.extract_reminder(self, msg)
         try:
             # 尝试解析时间
             title =tittle[0]
             parsed_time =tittle[1]
-            self.ap.logger.debug(f" name : {title}    time: {parsed_time}")
             print(f"--------- name : {title}    time: {parsed_time}")
+            self.ap.logger.debug(f" name : {title}    time: {parsed_time}")
             if parsed_time:
                 print(f" name : {title}    time: {parsed_time}")
                 self.ap.logger.debug(f" name : {title}    time: {parsed_time}")
-                self.scheduler.add_job(lambda: asyncio.create_task( self. send_reminder(self,self.ap, ctx.event.sender_id, title)),  'date',  run_date=parsed_time.strftime("%Y-%m-%d %H:%M:%S")    )
+                self.scheduler.add_job(lambda: asyncio.create_task( self. send_reminder(self,self.ap, ctx.event.sender_id, title)),  'date',  run_date=parsed_time)
             return
         except Exception as e:
                 ctx.add_return("reply", ["hello, {} !".format(e)])
