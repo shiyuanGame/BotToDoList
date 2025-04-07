@@ -154,7 +154,7 @@ class MyPlugin(BasePlugin):
             return
         except Exception as e:
             print(f" msg  error: {e  }    ") 
-        # ctx.prevent_default()
+        ctx.prevent_default()
     # 当收到群消息时触发
     @handler(GroupNormalMessageReceived)
     async def group_normal_message_received(self, ctx: EventContext):
