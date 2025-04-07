@@ -126,14 +126,16 @@ class MyPlugin(BasePlugin):
             ctx.ap.logger.error("延迟任务异常: {}".format(e))
 
     # 要放在MyPlugin类里面
-    async def send_reminder(self,  sender_id, title):
+    async def send_reminder(self,  ctx, title):
             adapter = self.host.get_platform_adapters()[0]
+            id=ctx.event.sender_id
             print(f"adapter  ------------- : { adapter  }    ") 
+            print(f"id  ------------- : { id  }    ") 
             await self.host.send_active_message(
                                         adapter=adapter,
                                         target_type="person",
-                                        target_id=self.ctx.event.query.launcher_id,
-                                        message=[f"hello, {sender_id} , {title}  !"]
+                                        target_id=id,
+                                        message=[f"hello, {id} , {title}  !"]
                                     )
     # 当收到个人消息时触发
     @handler(PersonNormalMessageReceived)
@@ -152,7 +154,7 @@ class MyPlugin(BasePlugin):
             print(f"name : {title}    time: {parsed_time}")
             if parsed_time:
                 print(f" name : {title}    time: {parsed_time}")
-                self.scheduler.add_job(lambda: asyncio.create_task( self. send_reminder( ctx.event.sender_id, title)),  'date',  run_date=parsed_time)
+                self.scheduler.add_job(lambda: asyncio.create_task( self. send_reminder( ctx , title)),  'date',  run_date=parsed_time)
             
             return
         except Exception as e:
