@@ -139,7 +139,11 @@ class MyPlugin(BasePlugin):
     async def person_normal_message_received(self, ctx: EventContext):
         ctx.prevent_default()
         msg = ctx.event.text_message  # 这里的 event 即为 PersonNormalMessageReceived 的对象
-        tittle=self.extract_reminder(self, msg)
+        print(f"--------- msg : {msg }    ")
+        self.ap.logger.debug(f"--------- msg : {msg }    ")
+        tittle=self.extract_reminder(msg)
+        print(f"--------- tittle name : {tittle }    ")
+        self.ap.logger.debug(f"--------- tittle name : {tittle }    ")
         try:
             # 尝试解析时间
             title =tittle[0]
