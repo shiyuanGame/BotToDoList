@@ -142,7 +142,7 @@ class MyPlugin(BasePlugin):
             print(f"--------- msg : {msg }    ") 
             tittle=self.extract_reminder(msg)
             print(f"--------- tittle name : {tittle }    ") 
-            ctx.prevent_default()
+            # ctx.prevent_default()
             # 尝试解析时间
             title =tittle[0]
             parsed_time =tittle[1]
@@ -154,6 +154,7 @@ class MyPlugin(BasePlugin):
             return
         except Exception as e:
             print(f"--------- msg : {e  }    ") 
+        ctx.prevent_default()
     # 当收到群消息时触发
     @handler(GroupNormalMessageReceived)
     async def group_normal_message_received(self, ctx: EventContext):
