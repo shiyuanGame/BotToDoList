@@ -22,7 +22,7 @@ class MyPlugin(BasePlugin):
     def __init__(self, host: APIHost):
         pass
 
-    def parse_time_expression( expr): 
+    def parse_time_expression(self, expr): 
     # 中文时间名词映射 
         now = datetime.now()  
         time_mapping = { 
