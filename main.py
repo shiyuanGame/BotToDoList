@@ -126,8 +126,8 @@ class MyPlugin(BasePlugin):
             ctx.ap.logger.error("延迟任务异常: {}".format(e))
 
     # 要放在MyPlugin类里面
-    async def send_reminder(self, ap, sender_id, title):
-            adapter = ap.get_platform_adapters()[0]
+    async def send_reminder(self,  sender_id, title):
+            adapter = self.host.get_platform_adapters()[0]
             await self.host.send_active_message(
                                         adapter=adapter,
                                         target_type="person",
@@ -151,7 +151,7 @@ class MyPlugin(BasePlugin):
             print(f"name : {title}    time: {parsed_time}")
             if parsed_time:
                 print(f" name : {title}    time: {parsed_time}")
-                self.scheduler.add_job(lambda: asyncio.create_task( self. send_reminder(self.ap, ctx.event.sender_id, title)),  'date',  run_date=parsed_time)
+                self.scheduler.add_job(lambda: asyncio.create_task( self. send_reminder( ctx.event.sender_id, title)),  'date',  run_date=parsed_time)
             
             return
         except Exception as e:
