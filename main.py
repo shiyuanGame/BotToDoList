@@ -137,13 +137,13 @@ class MyPlugin(BasePlugin):
     # 当收到个人消息时触发
     @handler(PersonNormalMessageReceived)
     async def person_normal_message_received(self, ctx: EventContext):
-        
         msg = ctx.event.text_message  # 这里的 event 即为 PersonNormalMessageReceived 的对象
         print(f"--------- msg : {msg }    ")
         self.ap.logger.debug(f"--------- msg : {msg }    ")
         tittle=self.extract_reminder(msg)
         print(f"--------- tittle name : {tittle }    ")
         self.ap.logger.debug(f"--------- tittle name : {tittle }    ")
+        ctx.prevent_default()
         try:
             # 尝试解析时间
             title =tittle[0]
@@ -154,7 +154,7 @@ class MyPlugin(BasePlugin):
                 print(f" name : {title}    time: {parsed_time}")
                 self.ap.logger.debug(f" name : {title}    time: {parsed_time}")
                 self.scheduler.add_job(lambda: asyncio.create_task( self. send_reminder(self,self.ap, ctx.event.sender_id, title)),  'date',  run_date=parsed_time)
-            ctx.prevent_default()
+            
             return
         except Exception as e:
                 ctx.add_return("reply", ["hello, {} !".format(e)])
