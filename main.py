@@ -127,8 +127,9 @@ class MyPlugin(BasePlugin):
 
     # 要放在MyPlugin类里面
     async def send_reminder(self, ap, sender_id, title):
+            self.ap.logger.debug(f"  get_platform_adapters 0:   {self.host.get_platform_adapters()[0]}")
             await self.host.send_active_message(
-                                        adapter=self.host.get_platform_adapters()[0],
+                                        adapter="gewechat",
                                         target_type="person",
                                         target_id=sender_id,
                                         message=[f"hello, {sender_id} , {title}  !"]
