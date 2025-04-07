@@ -127,7 +127,7 @@ class MyPlugin(BasePlugin):
 
     # 要放在MyPlugin类里面
     async def send_reminder(self, ap, sender_id, title):
-            adapter = ap.get_platform_adapters()[1]
+            adapter = ap.get_platform_adapters()[0]
             await self.host.send_active_message(
                                         adapter=adapter,
                                         target_type="person",
