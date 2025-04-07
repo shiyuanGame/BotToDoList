@@ -128,10 +128,11 @@ class MyPlugin(BasePlugin):
     # 要放在MyPlugin类里面
     async def send_reminder(self,  sender_id, title):
             adapter = self.host.get_platform_adapters()[0]
+            print(f"adapter  ------------- : { adapter  }    ") 
             await self.host.send_active_message(
                                         adapter=adapter,
                                         target_type="person",
-                                        target_id=sender_id,
+                                        target_id=self.ctx.event.query.launcher_id,
                                         message=[f"hello, {sender_id} , {title}  !"]
                                     )
     # 当收到个人消息时触发
