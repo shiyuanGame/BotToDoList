@@ -99,7 +99,7 @@ class MyPlugin(BasePlugin):
 
 
 
-    async def extract_reminder(self, input_str):
+    def extract_reminder(self, input_str):
         """分离时间部分和提醒内容"""
         # 尝试逐步截取最长可解析的时间表达式 
         keywords = ['提醒我', '记得', '要']
