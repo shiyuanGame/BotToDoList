@@ -151,10 +151,9 @@ class MyPlugin(BasePlugin):
             title =tittle[0]
             parsed_time =tittle[1]
             if parsed_time:
-                scheduler.add_job( 
-                lambda: asyncio.create_task( self. send_reminder(self,self.ap, ctx.event.sender_id, title)),
-                'date',
-                run_date=parsed_time.strftime('%Y-%m-%d %H:%M:%S'),    )
+                print(f" name : {title}    time: {parsed_time}")
+                self.ap.logger.debug(f" name : {title}    time: {parsed_time}")
+                scheduler.add_job(    lambda: asyncio.create_task( self. send_reminder(self,self.ap, ctx.event.sender_id, title)),  'date',  run_date=parsed_time ,    )
             return
         except Exception as e:
                 ctx.add_return("reply", ["hello, {} !".format(e)])
