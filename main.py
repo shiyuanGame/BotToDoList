@@ -113,7 +113,6 @@ def extract_reminder(input_str):
 # 注册插件
 @register(name="ToDoList", description="BotTodoList", version="0.2", author="Shiyuan")
 class MyPlugin(BasePlugin):
-
     # 插件加载时触发
     def __init__(self, host: APIHost):
         pass
@@ -121,7 +120,6 @@ class MyPlugin(BasePlugin):
     # 异步初始化
     async def initialize(self):
         pass
-
     async def delayed_job(ctx, sender_id):
         try:
             # 记录日志，确保任务执行
@@ -146,10 +144,12 @@ class MyPlugin(BasePlugin):
         ctx.prevent_default()
         msg = ctx.event.text_message  # 这里的 event 即为 PersonNormalMessageReceived 的对象
         tittle=extract_reminder(msg)
-            # 尝试解析时间
         try:
+            # 尝试解析时间
             title =tittle[0]
             parsed_time =tittle[1]
+            self.ap.logger.debug(f" name : {title}    time: {parsed_time}")
+            print(f"--------- name : {title}    time: {parsed_time}")
             if parsed_time:
                 print(f" name : {title}    time: {parsed_time}")
                 self.ap.logger.debug(f" name : {title}    time: {parsed_time}")
