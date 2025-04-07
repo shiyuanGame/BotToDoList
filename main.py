@@ -137,11 +137,11 @@ class MyPlugin(BasePlugin):
     # 当收到个人消息时触发
     @handler(PersonNormalMessageReceived)
     async def person_normal_message_received(self, ctx: EventContext):
-        print(f" ------------- : { ctx.event.text_message }    ") 
+        print(f" ------------- : { ctx.event.query.get_variables() }    ") 
 
         try:
             msg = ctx.event.text_message  # 这里的 event 即为 PersonNormalMessageReceived 的对象
-            print(f" msg : {msg }    ") 
+            print(f" msg : {msg }    { ctx.event.sender_id } ") 
             tittle=self.extract_reminder( msg)
             print(f"tittle name : {tittle }    ") 
             # ctx.prevent_default()
