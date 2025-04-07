@@ -143,8 +143,19 @@ class MyPlugin(BasePlugin):
     # 当收到个人消息时触发
     @handler(PersonNormalMessageReceived)
     async def person_normal_message_received(self, ctx: EventContext):
+        print(f"  get_platform_adapters 0:   {self.host.get_platform_adapters()[0]}")
+        print(f"  get_platform_adapters 1:   {self.host.get_platform_adapters()[1]}")
+        print(f"  get_platform_adapters 2:   {self.host.get_platform_adapters()[2]}")
+        print(f"  get_platform_adapters 3:   {self.host.get_platform_adapters()[3]}")
+        print(f"  get_platform_adapters 4:   {self.host.get_platform_adapters()[4]}")
+        print(f"  get_platform_adapters 5:   {self.host.get_platform_adapters()[5]}")
+        print(f"  get_platform_adapters 6:   {self.host.get_platform_adapters()[6]}")
+        print(f"  get_platform_adapters 7:   {self.host.get_platform_adapters()[7]}")
+        
         try:
             msg = ctx.event.text_message  # 这里的 event 即为 PersonNormalMessageReceived 的对象
+            
+            
             print(f" msg : {msg }    ") 
             tittle=self.extract_reminder( msg)
             print(f"tittle name : {tittle }    ") 
