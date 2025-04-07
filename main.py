@@ -110,7 +110,7 @@ class MyPlugin(BasePlugin):
                     if len(parts) > 1:
                         title = parts[1].split('|', 1)[0].strip()
                         break; 
-        time = self.parse_time_expression(input_str)
+        time = self.parse_time_expression(self,input_str)
         return (title , time)
     # 异步初始化
     async def initialize(self):
@@ -140,7 +140,7 @@ class MyPlugin(BasePlugin):
         try:
             msg = ctx.event.text_message  # 这里的 event 即为 PersonNormalMessageReceived 的对象
             print(f"--------- msg : {msg }    ") 
-            tittle=self.extract_reminder(msg)
+            tittle=self.extract_reminder(self,msg)
             print(f"--------- tittle name : {tittle }    ") 
             # ctx.prevent_default()
             # 尝试解析时间
