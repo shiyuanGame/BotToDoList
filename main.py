@@ -137,7 +137,7 @@ class MyPlugin(BasePlugin):
     # 当收到个人消息时触发
     @handler(PersonNormalMessageReceived)
     async def person_normal_message_received(self, ctx: EventContext):
-        print(f" ------------- : { ctx.event.query.get_variables() }    ") 
+        print(f" ------------- : { ctx.event.query.launcher_id  }    ") 
 
         try:
             msg = ctx.event.text_message  # 这里的 event 即为 PersonNormalMessageReceived 的对象
