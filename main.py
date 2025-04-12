@@ -8,7 +8,7 @@ import asyncio
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pytz import timezone
 from asyncio import get_event_loop, run_coroutine_threadsafe
-
+from asyncio import run_coroutine_threadsafe
 # 注册插件
 
 
@@ -109,6 +109,20 @@ class MyPlugin(BasePlugin):
                     break
         time = self.parse_time_expression(input_str)
         return (title, time)
+
+    def run_reminder(self,  ctx, title):
+        future = run_coroutine_threadsafe(
+            self.send_reminder(ctx, title), self.loop)
+
+        # 添加错误追踪
+        def callback(fut):
+            try:
+                fut.result()  # 会触发异常并打印
+            except Exception as e:
+                print(f"❌ Error in send_reminder: {e}")
+
+        future.add_done_callback(callback)
+
     # 异步初始化
 
     async def initialize(self):
@@ -140,6 +154,7 @@ class MyPlugin(BasePlugin):
 
     @handler(PersonNormalMessageReceived)
     async def person_normal_message_received(self, ctx: EventContext):
+
         print(f" ------------- : { ctx.event.query.launcher_id  }    ")
         try:
             msg = ctx.event.text_message  # 这里的 event 即为 PersonNormalMessageReceived 的对象
@@ -151,9 +166,12 @@ class MyPlugin(BasePlugin):
             title = tittle[0]
             parsed_time = tittle[1]
             print(f"name : {title}    time: {parsed_time}")
+            ctx.prevent_default()
             if parsed_time:
                 print(f" name : {title}    time: {parsed_time}")
 
+                self.scheduler.add_job(
+                    self.run_reminder, 'date', run_date=parsed_time)
                 # 调度任务的时候，传入一个普通的同步函数
                 self.scheduler.add_job(
                     lambda: run_coroutine_threadsafe(
@@ -164,7 +182,7 @@ class MyPlugin(BasePlugin):
             return
         except Exception as e:
             print(f" msg  error: {e  }    ")
-        ctx.prevent_default()
+
     # 当收到群消息时触发
 
     @handler(GroupNormalMessageReceived)
