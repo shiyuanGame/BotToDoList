@@ -1,15 +1,11 @@
 from pkg.plugin.context import register, handler, llm_func, BasePlugin, APIHost, EventContext
 from pkg.plugin.events import *  # 导入事件类
-import parsedatetime
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 import re
 import asyncio
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from pytz import timezone
-from asyncio import get_event_loop, run_coroutine_threadsafe
 from asyncio import run_coroutine_threadsafe
-from functools import partial
 # 注册插件
 
 
@@ -111,62 +107,35 @@ class MyPlugin(BasePlugin):
         time = self.parse_time_expression(input_str)
         return (title, time)
 
-    def run_reminder(self,  ctx, title):
-        future = run_coroutine_threadsafe(
-            self.send_reminder(ctx, title), self.loop)
-
-        # 添加错误追踪
-        def callback(fut):
-            try:
-                fut.result()  # 会触发异常并打印
-            except Exception as e:
-                print(f"❌ Error in send_reminder: {e}")
-
-        future.add_done_callback(callback)
-
     # 异步初始化
 
     async def initialize(self):
         pass
 
-    async def delayed_job(ctx, sender_id):
-        try:
-            # 记录日志，确保任务执行
-            self_logger = ctx.ap.logger  # 或者用你全局的 logger
-            self_logger.debug("延迟任务触发，准备回复消息给 {}！".format(sender_id))
-            # 回复消息
-            await ctx.add_return("reply", ["Delayed hello!"])
-        except Exception as e:
-            ctx.ap.logger.error("延迟任务异常: {}".format(e))
-
-    # 要放在MyPlugin类里面
+     # 要放在MyPlugin类里面
     async def send_reminder(self,  ctx, title):
         adapter = self.host.get_platform_adapters()[0]
         id = ctx.event.sender_id
-        print(f"adapter  ------------- : { adapter  }    ")
-        print(f"id  ------------- : { id  }    ")
         await ctx.host.send_active_message(
             adapter=adapter,
             target_type="person",
             target_id=id,
             message=platform_message.MessageChain([
                 platform_message.Plain(text=title)
-
             ])
         )
     # 当收到个人消息时触发
 
     @handler(PersonNormalMessageReceived)
     async def person_normal_message_received(self, ctx: EventContext):
-        ctx.prevent_default()
+
         try:
             msg = ctx.event.text_message
             tittle = self.extract_reminder(msg)
-            # ctx.prevent_default()
-            # 尝试解析时间
             title = tittle[0]
             parsed_time = tittle[1]
             if parsed_time:
+                ctx.prevent_default()
                 # 调度任务的时候，传入一个普通的同步函数
                 self.scheduler.add_job(
                     lambda: run_coroutine_threadsafe(
@@ -191,7 +160,7 @@ class MyPlugin(BasePlugin):
 
             # 阻止该事件默认行为（向接口获取回复）
             ctx.prevent_default()
-
     # 插件卸载时触发
+
     def __del__(self):
         pass
