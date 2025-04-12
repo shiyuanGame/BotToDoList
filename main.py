@@ -9,6 +9,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pytz import timezone
 from asyncio import get_event_loop, run_coroutine_threadsafe
 from asyncio import run_coroutine_threadsafe
+from functools import partial
 # 注册插件
 
 
@@ -166,12 +167,20 @@ class MyPlugin(BasePlugin):
             title = tittle[0]
             parsed_time = tittle[1]
             print(f"name : {title}    time: {parsed_time}")
-
+            ctx.prevent_default()
             if parsed_time:
                 print(f" name : {title}    time: {parsed_time}")
 
                 self.scheduler.add_job(
-                    self.run_reminder(ctx, title), 'date', run_date=parsed_time)
+                    lambda: self.run_reminder(ctx, title),
+                    'date',
+                    run_date=parsed_time
+                )
+                self.scheduler.add_job(
+                    partial(self.run_reminder, ctx, title),
+                    'date',
+                    run_date=parsed_time
+                )
                 # 调度任务的时候，传入一个普通的同步函数
                 self.scheduler.add_job(
                     lambda: run_coroutine_threadsafe(
@@ -181,7 +190,7 @@ class MyPlugin(BasePlugin):
                 )
         except Exception as e:
             print(f" msg  error: {e  }    ")
-        ctx.prevent_default()
+
     # 当收到群消息时触发
 
     @handler(GroupNormalMessageReceived)
