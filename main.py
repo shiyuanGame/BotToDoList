@@ -150,9 +150,7 @@ class MyPlugin(BasePlugin):
             target_type="person",
             target_id=id,
             message=platform_message.MessageChain([
-                # platform_message.At(target='wxid_xd12odto989122'),
-                platform_message.Plain(text=" id :{id}  +title: {title}")
-                # platform_message.Image(url='https://c.53326.com/d/file/lan20210602/tspho3sxi0s.jpg')
+                platform_message.Plain(text=title)
 
             ])
         )
@@ -160,32 +158,15 @@ class MyPlugin(BasePlugin):
 
     @handler(PersonNormalMessageReceived)
     async def person_normal_message_received(self, ctx: EventContext):
-
-        print(f" ------------- : { ctx.event.query.launcher_id  }    ")
+        ctx.prevent_default()
         try:
-            msg = ctx.event.text_message  # 这里的 event 即为 PersonNormalMessageReceived 的对象
-            print(f" msg : {msg }    { ctx.event.sender_id } ")
+            msg = ctx.event.text_message
             tittle = self.extract_reminder(msg)
-            print(f"tittle name : {tittle }    ")
             # ctx.prevent_default()
             # 尝试解析时间
             title = tittle[0]
             parsed_time = tittle[1]
-            print(f"name : {title}    time: {parsed_time}")
-            ctx.prevent_default()
             if parsed_time:
-                print(f" name : {title}    time: {parsed_time}")
-
-                self.scheduler.add_job(
-                    lambda: self.run_reminder(ctx, title),
-                    'date',
-                    run_date=parsed_time
-                )
-                self.scheduler.add_job(
-                    partial(self.run_reminder, ctx, title),
-                    'date',
-                    run_date=parsed_time
-                )
                 # 调度任务的时候，传入一个普通的同步函数
                 self.scheduler.add_job(
                     lambda: run_coroutine_threadsafe(
@@ -197,7 +178,6 @@ class MyPlugin(BasePlugin):
             print(f" msg  error: {e  }    ")
 
     # 当收到群消息时触发
-
     @handler(GroupNormalMessageReceived)
     async def group_normal_message_received(self, ctx: EventContext):
         msg = ctx.event.text_message  # 这里的 event 即为 GroupNormalMessageReceived 的对象
