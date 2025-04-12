@@ -171,7 +171,7 @@ class MyPlugin(BasePlugin):
                 print(f" name : {title}    time: {parsed_time}")
 
                 self.scheduler.add_job(
-                    self.run_reminder, 'date', run_date=parsed_time)
+                    self.run_reminder(ctx, title), 'date', run_date=parsed_time)
                 # 调度任务的时候，传入一个普通的同步函数
                 self.scheduler.add_job(
                     lambda: run_coroutine_threadsafe(
