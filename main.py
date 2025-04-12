@@ -7,9 +7,11 @@ import re
 import asyncio
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pytz import timezone
-
+from asyncio import get_event_loop, run_coroutine_threadsafe
 
 # 注册插件
+
+
 @register(name="ToDoList", description="BotTodoList", version="0.2", author="Shiyuan")
 class MyPlugin(BasePlugin):
     scheduler = AsyncIOScheduler()
@@ -150,9 +152,13 @@ class MyPlugin(BasePlugin):
             print(f"name : {title}    time: {parsed_time}")
             if parsed_time:
                 print(f" name : {title}    time: {parsed_time}")
-                self.scheduler.add_job(lambda: asyncio.create_task(
-                    self. send_reminder(ctx, title)),  'date',  run_date=parsed_time)
-
+                # 调度任务的时候，传入一个普通的同步函数
+                self.scheduler.add_job(
+                    lambda: run_coroutine_threadsafe(
+                        self.send_reminder(ctx, title), asyncio.get_event_loop()),
+                    'date',
+                    run_date=parsed_time
+                )
             return
         except Exception as e:
             print(f" msg  error: {e  }    ")
