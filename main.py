@@ -166,7 +166,7 @@ class MyPlugin(BasePlugin):
             title = tittle[0]
             parsed_time = tittle[1]
             print(f"name : {title}    time: {parsed_time}")
-            ctx.prevent_default()
+
             if parsed_time:
                 print(f" name : {title}    time: {parsed_time}")
 
@@ -179,10 +179,9 @@ class MyPlugin(BasePlugin):
                     'date',
                     run_date=parsed_time
                 )
-            return
         except Exception as e:
             print(f" msg  error: {e  }    ")
-
+        ctx.prevent_default()
     # 当收到群消息时触发
 
     @handler(GroupNormalMessageReceived)
