@@ -130,53 +130,54 @@ class MyPlugin(BasePlugin):
         await self.host.send_active_message(
             adapter=adapter,
             target_type="person",
-            target_id=id,
+            target_id="wxid_hi28bm74vido12",
             message=[f"hello, {id} , {title}  !"]
         )
     # 当收到个人消息时触发
 
     @handler(PersonNormalMessageReceived)
     async def person_normal_message_received(self, ctx: EventContext):
-        self.ap.logger.debug("hello, {}".format(ctx.event.sender_id))
-        print(ctx.host.get_platform_adapters())
-        print(ctx.event.launcher_type)
-        la_type = ctx.event.launcher_type
-        await ctx.host.send_active_message(
-            adapter=self.host.get_platform_adapters()[0],
-            target_type="person",
-            target_id="wxid_hi28bm74vido12",
-            message=platform_message.MessageChain([
-                # platform_message.At(target='wxid_xd12odto989122'),
-                platform_message.Plain(text='个人')
-                # platform_message.Image(url='https://c.53326.com/d/file/lan20210602/tspho3sxi0s.jpg')
+        # self.ap.logger.debug("hello, {}".format(ctx.event.sender_id))
+        # print(ctx.host.get_platform_adapters())
+        # print(ctx.event.launcher_type)
+        # la_type = ctx.event.launcher_type
+        # await ctx.host.send_active_message(
+        #     adapter=self.host.get_platform_adapters()[0],
+        #     target_type="person",
+        #     target_id="wxid_hi28bm74vido12",
+        #     message=platform_message.MessageChain([
+        #         # platform_message.At(target='wxid_xd12odto989122'),
+        #         platform_message.Plain(text='个人')
+        #         # platform_message.Image(url='https://c.53326.com/d/file/lan20210602/tspho3sxi0s.jpg')
 
-            ])
+        #     ])
 
-        )
-        # ctx.add_return("reply", ["hello, everyone!"])
+        # )
+        # # ctx.add_return("reply", ["hello, everyone!"])
 
+        # ctx.prevent_default()
+        print(f" ------------- : { ctx.event.query.launcher_id  }    ")
+        try:
+            msg = ctx.event.text_message  # 这里的 event 即为 PersonNormalMessageReceived 的对象
+            print(f" msg : {msg }    { ctx.event.sender_id } ")
+            tittle = self.extract_reminder(msg)
+            print(f"tittle name : {tittle }    ")
+            # ctx.prevent_default()
+            # 尝试解析时间
+            title = tittle[0]
+            parsed_time = tittle[1]
+            print(f"name : {title}    time: {parsed_time}")
+            if parsed_time:
+                print(f" name : {title}    time: {parsed_time}")
+                self.scheduler.add_job(lambda: asyncio.create_task(
+                    self. send_reminder(ctx, title)),  'date',  run_date=parsed_time)
+
+            return
+        except Exception as e:
+            print(f" msg  error: {e  }    ")
         ctx.prevent_default()
-        # print(f" ------------- : { ctx.event.query.launcher_id  }    ")
-        # try:
-        #     msg = ctx.event.text_message  # 这里的 event 即为 PersonNormalMessageReceived 的对象
-        #     print(f" msg : {msg }    { ctx.event.sender_id } ")
-        #     tittle = self.extract_reminder(msg)
-        #     print(f"tittle name : {tittle }    ")
-        #     # ctx.prevent_default()
-        #     # 尝试解析时间
-        #     title = tittle[0]
-        #     parsed_time = tittle[1]
-        #     print(f"name : {title}    time: {parsed_time}")
-        #     if parsed_time:
-        #         print(f" name : {title}    time: {parsed_time}")
-        #         self.scheduler.add_job(lambda: asyncio.create_task(
-        #             self. send_reminder(ctx, title)),  'date',  run_date=parsed_time)
-
-        #     return
-        # except Exception as e:
-        #     print(f" msg  error: {e  }    ")
-
     # 当收到群消息时触发
+
     @handler(GroupNormalMessageReceived)
     async def group_normal_message_received(self, ctx: EventContext):
         msg = ctx.event.text_message  # 这里的 event 即为 GroupNormalMessageReceived 的对象
