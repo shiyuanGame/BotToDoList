@@ -130,7 +130,7 @@ class MyPlugin(BasePlugin):
         await self.host.send_active_message(
             adapter=adapter,
             target_type="person",
-            target_id="wxid_hi28bm74vido12",
+            target_id=id,
             message=[f"hello, {id} , {title}  !"]
         )
     # 当收到个人消息时触发
@@ -169,8 +169,7 @@ class MyPlugin(BasePlugin):
             print(f"name : {title}    time: {parsed_time}")
             if parsed_time:
                 print(f" name : {title}    time: {parsed_time}")
-                self.scheduler.add_job(lambda: asyncio.create_task(
-                    self. send_reminder(ctx, title)),  'date',  run_date=parsed_time)
+                await self.scheduler.add_job(lambda: asyncio.create_task(self. send_reminder(ctx, title)),  'date',  run_date=parsed_time)
 
             return
         except Exception as e:
