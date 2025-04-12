@@ -149,7 +149,12 @@ class MyPlugin(BasePlugin):
             adapter=adapter,
             target_type="person",
             target_id=id,
-            message=[f"hello, {id} , {title}  !"]
+            message=platform_message.MessageChain([
+                # platform_message.At(target='wxid_xd12odto989122'),
+                platform_message.Plain(text=" id :{id}  +title: {title}")
+                # platform_message.Image(url='https://c.53326.com/d/file/lan20210602/tspho3sxi0s.jpg')
+
+            ])
         )
     # 当收到个人消息时触发
 
