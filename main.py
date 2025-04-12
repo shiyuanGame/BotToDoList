@@ -143,8 +143,8 @@ class MyPlugin(BasePlugin):
         la_type = ctx.event.launcher_type
         await ctx.host.send_active_message(
             adapter=self.host.get_platform_adapters()[0],
-            target_type="group",
-            target_id="48371594138@chatroom",
+            target_type="person",
+            target_id="person_wxid_hi28bm74vido12",
             message=platform_message.MessageChain([
                 # platform_message.At(target='wxid_xd12odto989122'),
                 platform_message.Plain(text='个人')
