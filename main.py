@@ -19,6 +19,7 @@ class MyPlugin(BasePlugin):
     # 插件加载时触发
 
     def __init__(self, host: APIHost):
+        self.loop = asyncio.get_event_loop()
         pass
 
     def parse_time_expression(self, expr):
@@ -152,10 +153,11 @@ class MyPlugin(BasePlugin):
             print(f"name : {title}    time: {parsed_time}")
             if parsed_time:
                 print(f" name : {title}    time: {parsed_time}")
+
                 # 调度任务的时候，传入一个普通的同步函数
                 self.scheduler.add_job(
                     lambda: run_coroutine_threadsafe(
-                        self.send_reminder(ctx, title), asyncio.get_event_loop()),
+                        self.send_reminder(ctx, title), self.loop),
                     'date',
                     run_date=parsed_time
                 )
