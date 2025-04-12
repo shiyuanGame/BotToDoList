@@ -145,7 +145,7 @@ class MyPlugin(BasePlugin):
         id = ctx.event.sender_id
         print(f"adapter  ------------- : { adapter  }    ")
         print(f"id  ------------- : { id  }    ")
-        await self.host.send_active_message(
+        await ctx.host.send_active_message(
             adapter=adapter,
             target_type="person",
             target_id=id,
